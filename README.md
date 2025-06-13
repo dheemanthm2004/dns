@@ -1,5 +1,24 @@
 # 🔔 DheeNotifications - Enterprise Notification Platform
 
+<div align="center">
+
+![DheeNotifications](https://img.shields.io/badge/DheeNotifications-Enterprise-blue?style=for-the-badge)
+![Node.js](https://img.shields.io/badge/Node.js-18+-green?style=for-the-badge&logo=node.js)
+![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-5+-blue?style=for-the-badge&logo=typescript)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-12+-blue?style=for-the-badge&logo=postgresql)
+![Redis](https://img.shields.io/badge/Redis-6+-red?style=for-the-badge&logo=redis)
+
+**A comprehensive, production-ready notification system built with modern technologies**
+
+[🚀 Quick Start](#-quick-start) • [📖 Documentation](#-detailed-setup) • [🏗️ Architecture](#️-architecture) • [🚀 Deploy](#-deployment)
+
+</div>
+
+---
+
+## 🌟 Features
+
 A production-ready, scalable notification platform supporting multiple channels (Email, SMS, In-App, Push) with real-time analytics, template management, and batch processing.
 
 ## 🚀 Features
