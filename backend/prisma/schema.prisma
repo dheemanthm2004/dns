@@ -1,0 +1,151 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(USER)
+  apiKey    String?  @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  notifications          NotificationLog[]
+  scheduledNotifications ScheduledNotification[]
+  templates              NotificationTemplate[]
+  organizationMemberships OrganizationMember[]
+
+  @@map("users")
+}
+
+model Organization {
+  id        Int      @id @default(autoincrement())
+  name      String
+  domain    String   @unique
+  settings  Json     @default("{}")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  members   OrganizationMember[]
+  templates NotificationTemplate[]
+
+  @@map("organizations")
+}
+
+model OrganizationMember {
+  id     Int    @id @default(autoincrement())
+  userId Int
+  orgId  Int
+  role   String @default("MEMBER")
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, orgId])
+  @@map("organization_members")
+}
+
+model NotificationTemplate {
+  id        Int      @id @default(autoincrement())
+  name      String
+  subject   String?
+  body      String
+  channel   String
+  variables Json     @default("[]")
+  isActive  Boolean  @default(true)
+  createdBy Int
+  orgId     Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  creator      User          @relation(fields: [createdBy], references: [id])
+  organization Organization? @relation(fields: [orgId], references: [id])
+
+  @@map("notification_templates")
+}
+
+model NotificationLog {
+  id         Int      @id @default(autoincrement())
+  to         String
+  channel    String
+  message    String
+  subject    String?
+  templateId Int?
+  status     String
+  error      String?
+  attempt    Int      @default(1)
+  userId     Int?
+  metadata   Json     @default("{}")
+  createdAt  DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([createdAt])
+  @@index([status])
+  @@index([channel])
+  @@map("notification_logs")
+}
+
+model ScheduledNotification {
+  id         Int      @id @default(autoincrement())
+  to         String
+  channel    String
+  message    String
+  subject    String?
+  templateId Int?
+  sendAt     DateTime
+  status     String   @default("pending")
+  userId     Int?
+  metadata   Json     @default("{}")
+  createdAt  DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([sendAt])
+  @@index([status])
+  @@map("scheduled_notifications")
+}
+
+model NotificationAnalytics {
+  id        Int      @id @default(autoincrement())
+  date      DateTime
+  channel   String
+  sent      Int      @default(0)
+  delivered Int      @default(0)
+  failed    Int      @default(0)
+  opened    Int      @default(0)
+  clicked   Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@unique([date, channel], name: "date_channel")
+  @@index([date])
+  @@map("notification_analytics")
+}
+
+model ErrorLog {
+  id        Int      @id @default(autoincrement())
+  message   String
+  stack     String?
+  level     String   @default("ERROR")
+  context   Json     @default("{}")
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([level])
+  @@map("error_logs")
+}
+
+enum Role {
+  ADMIN
+  USER
+  READONLY
+}
